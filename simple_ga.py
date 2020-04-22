@@ -1,5 +1,4 @@
 import random
-import string
 from datetime import datetime
 from matplotlib import pyplot
 import string
@@ -7,10 +6,10 @@ import string
 WHITESPACE = ' '
 GENES_SET = string.ascii_lowercase + WHITESPACE
 
-target = 'porygon pikachu mama mia'
+target = 'some'
 pop_max = 1000
 initial_pop = [''.join(random.choices(GENES_SET, k=len(target))) for _ in range(pop_max)]
-mutation_rate = 0.01
+mutation_rate = 0.02
 
 # Charts data
 x_data, y_data = [], []
@@ -26,8 +25,8 @@ def fitness(member):
 
 def find_fittest():
     scores = [(i, fitness(i)) for i in initial_pop]
-    maxp = max(scores, key=lambda x: x[1])
-    return maxp
+    element, score = max(scores, key=lambda x: x[1])
+    return ''.join(element), score
 
 
 def create_mating_pool():
@@ -43,15 +42,24 @@ def crossover(a, b):
     return a[:midpoint] + b[midpoint:]
 
 
-found = False
+def mutate_genes(element):
+    temp = []
+    for i, e in enumerate(element):
+        if random.random() < mutation_rate:
+            e = random.choice(GENES_SET)
+        temp.append(e)
+    return ''.join(temp)
+
+
 generation = 0
 MAX_ITER = 1000
-while not found:
+
+while True:
     generation += 1
 
     # Find fittest
     fittest, score = find_fittest()
-    print(generation, fittest, score)
+    print(f'Generation {generation}\nFittest: {fittest}')
 
     # charts
     x_data.append(datetime.now())
@@ -71,6 +79,7 @@ while not found:
         parent_a = random.choice(mating_pool)
         parent_b = random.choice(mating_pool)
         child = crossover(parent_a, parent_b)
+        child = mutate_genes(child)
         temp_pop.append(child)
 
     # Replace pop
